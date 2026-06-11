@@ -5,8 +5,17 @@ COZE_WORKSPACE_PATH="${COZE_WORKSPACE_PATH:-$(pwd)}"
 
 cd "${COZE_WORKSPACE_PATH}"
 
-echo "Installing dependencies..."
-pnpm install --prefer-frozen-lockfile --prefer-offline --loglevel debug --reporter=append-only
+echo "Installing all dependencies (including dev)..."
+pnpm install --prefer-offline --reporter=append-only
+
+echo "Ensuring TypeScript is available..."
+pnpm add -D typescript@5.9.3 --reporter=append-only 2>/dev/null || true
+
+echo "Installing missing typescript globally as fallback..."
+if ! [ -d "node_modules/typescript" ]; then
+  echo "Installing typescript as a regular dependency..."
+  pnpm add typescript@5.9.3 --reporter=append-only
+fi
 
 echo "Building the Next.js project..."
 pnpm next build
