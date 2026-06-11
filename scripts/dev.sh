@@ -31,4 +31,9 @@ echo "Clearing port ${DEPLOY_RUN_PORT} before start."
 kill_port_if_listening
 echo "Starting HTTP service on port ${DEPLOY_RUN_PORT} for dev..."
 
-PORT=${DEPLOY_RUN_PORT} pnpm tsx watch src/server.ts
+# 优先使用项目本地的 tsx，避免 pnpm shim 找不到 node
+if [[ -x "./node_modules/.bin/tsx" ]]; then
+  PORT=${DEPLOY_RUN_PORT} ./node_modules/.bin/tsx watch src/server.ts
+else
+  PORT=${DEPLOY_RUN_PORT} node ./node_modules/tsx/dist/cli.mjs watch src/server.ts
+fi
